@@ -1,10 +1,9 @@
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:ngdemo13/models/post_model.dart';
-
-
-import '../services/http_service.dart';
-import '../services/log_service.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:ngdemo13/controllers/addpost_contiroller.dart';
 
 class AddPostPage extends StatefulWidget {
   const AddPostPage({super.key});
@@ -14,23 +13,7 @@ class AddPostPage extends StatefulWidget {
 }
 
 class _AddPostPageState extends State<AddPostPage> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _bodyController = TextEditingController();
-
-  _addPost() async{
-    String title = _titleController.text.toString().trim();
-    String body = _bodyController.text.toString().trim();
-    Post post = Post(userId: 1,title: title, body: body);
-
-    var response = await Network.POST(Network.API_POST_CREATE, Network.paramsCreate(post));
-    LogService.d(response!);
-    //PostRes postRes = Network.parsePostRes(response);
-    backToFinish();
-  }
-
-  backToFinish(){
-    Navigator.of(context).pop(true);
-  }
+  final _controller = Get.find<AddPostController>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,41 +26,45 @@ class _AddPostPageState extends State<AddPostPage> {
           backgroundColor: Colors.blue,
           title: Text("Add Post"),
         ),
-        body: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Container(
-                child: TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                      hintText: "Title"
+        body: GetBuilder<AddPostController>(
+          builder:(controller){
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Container(
+                    child: TextField(
+                      controller: _controller.titleController,
+                      decoration: InputDecoration(
+                          hintText: "Title"
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Container(
-                child: TextField(
-                  controller: _bodyController,
-                  decoration: InputDecoration(
-                      hintText: "Body"
+                  Container(
+                    child: TextField(
+                      controller: _controller.bodyController,
+                      decoration: InputDecoration(
+                          hintText: "Body"
+                      ),
+                    ),
                   ),
-                ),
+                  Container(
+                      margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      child: MaterialButton(
+                        color: Colors.blue,
+                        onPressed: () {
+                          _controller.addPost();
+                        },
+                        child: Text("Add"),
+                      )
+                  ),
+                ],
               ),
-              Container(
-                  margin: EdgeInsets.only(top: 10),
-                  width: double.infinity,
-                  child: MaterialButton(
-                    color: Colors.blue,
-                    onPressed: () {
-                      _addPost();
-                    },
-                    child: Text("Add"),
-                  )
-              ),
-            ],
-          ),
-        ),
+            );
+          } ,
+        )
       ),
     );
   }
